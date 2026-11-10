@@ -67,7 +67,7 @@ Projekt nie zawiera pełnego modułu bankowego, deklaracji podatkowych, list pł
 ## Przebieg pracy
 
 1. Pracownik loguje się i wybiera klienta.
-2. Dodaje dokumenty. Program zapisuje oryginały i sprawdza, czy skan można podzielić na osobne dokumenty.
+2. Dodaje dokumenty (opcjonalnie). Program zapisuje oryginały i sprawdza, czy skan można podzielić na osobne dokumenty.
 3. AI przygotowuje propozycję danych faktury, w tym konta i kody VAT. Dokument oczekuje w kolejce; pracownik może przejść do innego dokumentu.
 4. Pracownik porównuje formularz z oryginałem, poprawia pola oraz potwierdza sprawdzenie.
 5. Kliknięcie **Zaksięguj fakturę** zapisuje fakturę, pozycje, zbilansowany dekret i rejestr VAT w jednej transakcji.
