@@ -1,0 +1,7 @@
+fastapi==0.115.12
+uvicorn==0.34.2
+psycopg[binary]==3.2.9
+python-multipart==0.0.20
+PyMuPDF==1.26.6
+Pillow==11.3.0
+python-dotenv==1.2.1

@@ -1,0 +1,10 @@
+.posting-actions{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+#postingVat h3{margin:0 0 7px}
+#postingVat p{font-size:.86rem;color:#516c63}
+#postingJournal summary{cursor:pointer;margin-bottom:12px}
+.inventaris-layout>div,.inventaris-list{min-width:0}
+.inventaris-item{white-space:normal;min-width:0}
+.inventaris-item strong,.inventaris-item small{min-width:0;overflow-wrap:anywhere}
+.inventaris-card-heading{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}
+.inventaris-card-heading h3{min-width:0;overflow-wrap:anywhere}
+.inventaris-card-heading button{flex:none}

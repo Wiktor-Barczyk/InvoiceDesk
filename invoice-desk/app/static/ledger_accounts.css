@@ -1,0 +1,63 @@
+.ledger-view-switch{display:flex;gap:6px;margin:16px 0;flex-wrap:wrap}
+.ledger-view-switch button{font:inherit;font-size:.88rem;min-height:42px;padding:9px 16px;border:1px solid #cbded5;border-radius:8px;background:#fff;color:#28594b;cursor:pointer}
+.ledger-view-switch button[aria-selected="true"]{background:#245b4b;color:#fff;border-color:#245b4b;font-weight:600}
+.ledger-account-tools{display:flex;gap:10px 16px;align-items:end;flex-wrap:wrap;margin:16px 0}
+.ledger-account-tools .field{flex:1 1 230px;max-width:380px}
+.ledger-account-tools .field input{width:100%;min-width:0}
+.ledger-account-options{font-size:.82rem;min-width:150px}
+.ledger-account-options summary{cursor:pointer;min-height:42px;padding:11px 13px;border:1px solid #cbded5;border-radius:7px;background:#fff;color:#28594b}
+.ledger-account-options>div{display:flex;gap:8px;align-items:center;flex-wrap:wrap;padding-top:10px}
+.ledger-empty-toggle{display:flex;gap:8px;align-items:center;min-height:42px;font-size:.84rem;cursor:pointer}
+.ledger-empty-toggle input{width:17px;height:17px;accent-color:#245b4b}
+.ledger-account-summary{font-size:.82rem;color:#4f6a60;margin:10px 0}
+.ledger-account-hint,.ledger-account-help{font-size:.8rem;line-height:1.6;color:#567064;max-width:950px}
+.ledger-account-help{margin:10px 0 16px}
+.ledger-account-help summary{cursor:pointer;font-weight:600;padding:5px 0}
+.ledger-account-scroll{max-width:100%;overflow:auto;border:1px solid #dfebe4;border-radius:10px}
+.ledger-accounts-table{width:100%;border-collapse:collapse;font-size:.86rem;table-layout:auto}
+.ledger-accounts-table th,.ledger-accounts-table td{padding:11px 12px;border-bottom:1px solid #e2ebe6;vertical-align:middle}
+.ledger-accounts-table thead th{background:#f0f6f2;text-align:left;color:#244c3e;font-size:.77rem;position:sticky;top:0;z-index:1}
+.ledger-accounts-table td:nth-child(2),.ledger-accounts-table td:nth-child(3),.ledger-accounts-table thead th:nth-child(2),.ledger-accounts-table thead th:nth-child(3){text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ledger-accounts-table tbody th{text-align:left;font-weight:400;min-width:180px}
+.ledger-accounts-table tr:last-child>*{border-bottom:0}
+.ledger-accounts-table tr:hover{background:#f8fbf9}
+.ledger-account-group{background:#edf4ef!important}
+.ledger-account-group td,.ledger-account-group th{font-weight:650}
+.ledger-account-group button{border:0;background:none;color:#2a5949;cursor:pointer;font:inherit;min-height:30px;text-align:left;padding:0}
+.ledger-account-name{display:flex;align-items:start;gap:5px;padding-inline-start:calc(var(--account-depth)*12px);min-width:0}
+.ledger-account-chevron{display:inline-flex;justify-content:center;align-items:center;flex:none;width:26px;min-height:32px;padding:0;border:0;background:none;color:#43675a;font:inherit;cursor:pointer}
+.ledger-account-link{display:block;white-space:normal;font:inherit;border:0;background:none;text-align:left;padding:6px 0;color:#234e40;cursor:pointer;overflow-wrap:anywhere;line-height:1.4}
+.ledger-account-link b{font-variant-numeric:tabular-nums;margin-right:5px}
+.ledger-account-link small{display:inline-block;color:#6a7e72;font-size:.68rem;margin-left:7px}
+.ledger-account-balance{font-weight:650}
+.ledger-account-scope{display:flex;align-items:center;gap:10px;flex-wrap:wrap;padding:12px;background:#f1f7f3;border:1px solid #d9e7dd;border-radius:8px;margin:12px 0}
+.ledger-account-scope span{font-size:.78rem;color:#567064;flex:1 1 180px}
+#ledgerAccounts[aria-busy="true"] .ledger-account-scroll{opacity:.5;pointer-events:none}
+#ledgerAccounts[aria-busy="true"] .ledger-account-tools{pointer-events:none;opacity:.7}
+.ledger-view-switch button:focus-visible,.ledger-account-link:focus-visible,.ledger-account-chevron:focus-visible,.ledger-account-group button:focus-visible{outline:2px solid #b48438;outline-offset:3px}
+@media(max-width:700px){
+ .ledger-view-switch{display:grid;grid-template-columns:1fr 1fr}
+ .ledger-view-switch button{min-height:44px}
+ .ledger-account-tools{gap:10px}
+ .ledger-account-tools .field{max-width:none;flex-basis:100%}
+ .ledger-account-options{flex-basis:100%}
+ .ledger-account-tools .secondary{flex:1;min-height:42px;padding:8px;font-size:.77rem}
+ .ledger-empty-toggle{flex-basis:100%}
+ .ledger-account-scroll{border:0;border-radius:0;overflow:visible}
+ .ledger-accounts-table,.ledger-accounts-table tbody{display:block;width:100%}
+ .ledger-accounts-table thead{display:none}
+ .ledger-accounts-table tr{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:10px;padding:12px;margin:10px 0;border:1px solid #dce8e0;border-radius:9px;background:#fff}
+ .ledger-accounts-table th,.ledger-accounts-table td{display:block;min-width:0!important;padding:0;border:0;white-space:normal!important;text-align:left!important;overflow-wrap:anywhere}
+ .ledger-accounts-table tbody th{grid-column:1/-1}
+ .ledger-accounts-table td[data-label]::before{content:attr(data-label);display:block;color:#647c6d;font-size:.68rem;font-weight:400;margin-bottom:4px}
+ .ledger-accounts-table td:last-child{grid-column:1/-1}
+ .ledger-accounts-table td:last-child:empty{display:none}
+ .ledger-accounts-table .secondary{min-height:42px;width:100%;padding:8px}
+ .ledger-account-name{padding-inline-start:calc(min(var(--account-depth),4)*8px)}
+ .ledger-account-chevron{min-height:40px;width:24px}
+ .ledger-account-link{min-height:40px}
+ .ledger-account-group{margin-top:16px!important}
+ .ledger-account-group button{min-height:36px}
+ .ledger-account-scope strong,.ledger-account-scope span{flex-basis:100%}
+ .ledger-account-scope .secondary{flex:1;min-height:42px;font-size:.76rem;padding:8px}
+}

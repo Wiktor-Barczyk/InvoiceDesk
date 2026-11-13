@@ -1,0 +1,230 @@
+<!doctype html>
+<html lang="pl">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+  <title>Faktury · Invoice Desk</title>
+  <meta name="theme-color" content="#1d5749">
+  <link rel="icon" href="/static/favicon.svg" type="image/svg+xml">
+  <link rel="stylesheet" href="/static/style.css">
+  <link rel="stylesheet" href="/static/splitting.css">
+  <link rel="stylesheet" href="/static/responsive.css?v=1.4.1">
+  <script src="/static/app.js?v=auto-split-1" defer></script>
+  <link rel="stylesheet" href="/static/booking.css?v=1.4.1">
+  <script src="/static/booking.js?v=1.4.2" defer></script>
+  <script src="/static/splitting.js?v=ledger-1" defer></script>
+  <script src="/static/workspace.js?v=ledger-1" defer></script>
+  <link rel="stylesheet" href="/static/inventaris.css?v=inventaris-events-1">
+  <script src="/static/inventaris.js?v=inventaris-events-1" defer></script>
+  <link rel="stylesheet" href="/static/posting.css?v=1">
+  <script src="/static/posting.js?v=ledger-1" defer></script>
+  <link rel="stylesheet" href="/static/ledger.css?v=4">
+  <script src="/static/ledger.js?v=accounts-1" defer></script>
+  <link rel="stylesheet" href="/static/mobile.css?v=2">
+  <script src="/static/mobile.js?v=2" defer></script>
+  <link rel="stylesheet" href="/static/auto_split.css?v=1">
+  <script src="/static/auto_split.js?v=1" defer></script>
+  <link rel="stylesheet" href="/static/ledger_accounts.css?v=1">
+  <script src="/static/ledger_accounts.js?v=1" defer></script>
+</head>
+<body>
+<div id="loginScreen" class="login-screen" hidden>
+  <form id="loginForm" class="login-card">
+    <div class="brand"><span class="brand-mark">ID</span><div>Invoice Desk<span>KSIĘGOWOŚĆ</span></div></div>
+    <h1>Dzień dobry.</h1><p>Zaloguj się do weryfikacji faktur.</p>
+    <label for="email">E-mail pracownika</label><input id="email" type="email" autocomplete="username" required placeholder="name@example.org">
+    <label for="password">Hasło</label><input id="password" type="password" autocomplete="current-password" required>
+    <p id="loginError" class="error-text" role="alert"></p>
+    <button class="primary" type="submit" id="loginSubmit">Zaloguj się <span aria-hidden="true">→</span></button>
+    <small>Dostęp dla uprawnionych pracowników.</small>
+  </form>
+</div>
+<div id="loadingScreen" class="loading-screen"><span class="spinner"></span> Łączenie z aplikacją…</div>
+<div id="app" class="app" hidden>
+  <aside class="sidebar" id="documentSidebar">
+    <div class="brand"><span class="brand-mark">ID</span><div>Invoice Desk<span>KSIĘGOWOŚĆ</span></div></div>
+    <div class="client-block"><label for="clientSelect">Obsługiwany klient</label><select id="clientSelect"></select></div>
+    <nav id="clientSections" class="client-sections" aria-label="Menu klienta" hidden>
+      <button id="invoiceTab" class="secondary" type="button" aria-current="page"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8zM14 2v6h6M8 13h8M8 17h5"/></svg><span class="client-nav-label">Faktury</span><span class="client-nav-arrow" aria-hidden="true">›</span></button>
+      <button id="ledgerTab" class="secondary" type="button"><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M4 3h14a2 2 0 0 1 2 2v16H6a2 2 0 0 1-2-2V3zM4 17h16M8 7h8M8 11h6"/></svg><span class="client-nav-label">Księga klienta</span><span class="client-nav-arrow" aria-hidden="true">›</span></button>
+      <button id="inventarisTab" class="secondary" type="button" hidden><svg aria-hidden="true" viewBox="0 0 24 24" fill="none" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"><path d="M3 21h18M5 17V9h4v8M10 17V5h4v12M15 17V12h4v5"/></svg><span class="client-nav-label">Amortyzacja</span><span class="client-nav-arrow" aria-hidden="true">›</span></button>
+    </nav>
+    <div class="queue-heading"><span data-icon="stack"></span><strong>Dokumenty</strong><span id="queueCount" class="count">0</span></div>
+    <button id="uploadBtn" class="primary upload"><span data-icon="plus"></span> Dodaj faktury</button>
+    <input id="fileInput" type="file" accept="application/pdf,image/png,image/jpeg" multiple hidden>
+    <div class="search-wrap"><span data-icon="search"></span><input id="search" type="search" aria-label="Szukaj dokumentu" placeholder="Szukaj dokumentu…"></div>
+    <div class="queue-tabs" role="group" aria-label="Status dokumentów"><button id="pendingTab" class="selected">Do sprawdzenia</button><button id="approvedTab">Zapisane</button></div>
+    <div id="aiSummary" class="ai-summary" role="status" hidden></div>
+    <div id="documentList" class="document-list" aria-label="Lista faktur"></div>
+    <button id="loadMore" class="text-button" hidden>Wczytaj kolejne dokumenty</button>
+    <div class="sidebar-footer"><span class="avatar" id="avatar">TD</span><div><strong id="userName"></strong><small id="userRole"></small></div><button id="logoutBtn" class="icon-button" title="Wyloguj" aria-label="Wyloguj"><span data-icon="logout"></span></button></div>
+  </aside>
+  <main class="main">
+    <header class="topbar"><div><button id="toggleDocuments" class="secondary" aria-expanded="true" aria-controls="documentSidebar">☰ Zwiń menu</button><span class="breadcrumb">Dokumenty <span>/</span> Faktury</span><h1 id="portalTitle">Weryfikacja faktury</h1></div><div class="topbar-right"><div class="view-tabs" role="group" aria-label="Widok faktury"><button type="button" data-view="form" aria-pressed="false">Formularz</button><button type="button" data-view="preview" aria-pressed="false">Oryginał</button><button type="button" data-view="both" aria-pressed="true">Obok siebie</button></div><button id="topLogout" class="icon-button mobile-logout" aria-label="Wyloguj" title="Wyloguj"><span data-icon="logout"></span></button><span id="modeBadge" class="mode-badge"></span><span class="connection"><i></i> Baza połączona</span></div></header>
+    <div id="emptyState" class="empty-state" hidden><div class="empty-icon" data-icon="file"></div><h2>Gotowe na pierwszą fakturę</h2><p>Wybierz klienta i dodaj PDF, JPG lub PNG.<br>Dane do sprawdzenia pojawią się obok dokumentu.</p><button id="emptyUpload" class="primary"><span data-icon="plus"></span> Dodaj fakturę</button></div>
+    <div id="workspace" class="workspace" hidden>
+      <section class="editor" aria-label="Dane faktury">
+        <div class="editor-heading"><div><span class="eyebrow">DANE DOKUMENTU</span><h2 id="invoiceTitle">Nowa faktura</h2></div><span id="invoiceStatus" class="status-pill"></span></div>
+        <div id="editorScroll" class="editor-scroll">
+          <div id="aiPanel" class="ai-panel" hidden></div>
+          <div id="formError" class="notice error" role="alert" hidden></div>
+          <div id="splitContext" class="split-context" hidden></div>
+          <div id="splitAction" class="split-action" hidden><div><strong>Kilka dokumentów w jednym pliku?</strong><p>Program rozpozna i rozdzieli dokumenty. Niepewne ramki możesz poprawić.</p></div><div class="auto-split-buttons"><button id="splitAuto" type="button" class="secondary">Rozdziel automatycznie</button><button id="splitOpen" type="button" class="secondary">Zaznacz ręcznie</button></div></div>
+          <details id="recognitionDetails" class="recognition"><summary><span data-icon="scan"></span><span id="recognitionLabel">Dane odczytane z dokumentu</span><span class="detail-chevron">⌄</span></summary><div id="recognitionBody"></div></details>
+          <form id="invoiceForm" autocomplete="off">
+            <fieldset id="formFields">
+              <section class="form-section"><div class="section-title"><span class="section-number">01</span><h3>Podstawowe informacje</h3></div>
+                <div class="fields two">
+                  <div class="field"><label for="invoice_type">Typ transakcji</label><select id="invoice_type" data-key="invoice_type"><option value="purchase">Zakup</option><option value="sale">Sprzedaż</option></select></div>
+                  <div class="field"><label for="invoice_kind">Rodzaj dokumentu</label><select id="invoice_kind" data-key="invoice_kind"><option value="invoice">Faktura</option><option value="credit_note">Korekta / creditnota</option><option value="self_billing">Samofakturowanie</option><option value="other">Inny / paragon</option></select></div>
+                  <div class="field full"><label for="invoice_number">Numer faktury</label><input id="invoice_number" data-key="invoice_number" maxlength="100" placeholder="Wpisz numer z faktury"></div>
+                  <div class="field"><label for="invoice_date">Data wystawienia</label><input id="invoice_date" data-key="invoice_date" type="date" required></div>
+                  <div class="field"><label for="due_date">Termin płatności <span>opcjonalnie</span></label><input id="due_date" data-key="due_date" type="date"></div>
+                  <div class="field"><label for="currency">Waluta</label><input id="currency" data-key="currency" maxlength="3" placeholder="EUR" required></div>
+                  <div id="rateField" class="field full" hidden><label for="exchange_rate_to_eur">Kurs do EUR · 1 jednostka waluty = … EUR</label><input id="exchange_rate_to_eur" data-key="exchange_rate_to_eur" inputmode="decimal" placeholder="np. 0,2345000000"></div>
+                </div>
+              </section>
+              <section class="form-section"><div class="section-title"><span class="section-number">02</span><h3>Sprzedawca i nabywca</h3></div>
+                <div class="fields two">
+                  <div class="field full"><label for="counterparty_id">Kartoteka kontrahenta</label><select id="counterparty_id" data-key="counterparty_id"></select></div>
+                  <div class="field full"><label for="seller_name_snapshot">Sprzedawca</label><input id="seller_name_snapshot" data-key="seller_name_snapshot" maxlength="255" required placeholder="Nazwa sprzedawcy z faktury"></div>
+                  <div class="field"><label for="seller_vat_number_snapshot">BTW-ID / NIP sprzedawcy</label><input id="seller_vat_number_snapshot" data-key="seller_vat_number_snapshot" maxlength="40" placeholder="Numer z dokumentu"></div>
+                  <div class="field"><label for="seller_iban_snapshot">IBAN sprzedawcy</label><input id="seller_iban_snapshot" data-key="seller_iban_snapshot" maxlength="34" placeholder="Opcjonalnie"></div>
+                  <div class="field full"><label for="buyer_name_snapshot">Nabywca</label><input id="buyer_name_snapshot" data-key="buyer_name_snapshot" maxlength="255" required placeholder="Nazwa nabywcy z faktury"></div>
+                  <div class="field full"><label for="buyer_vat_number_snapshot">BTW-ID / NIP nabywcy</label><input id="buyer_vat_number_snapshot" data-key="buyer_vat_number_snapshot" maxlength="40" placeholder="Numer z dokumentu"></div>
+                </div><div id="partyWarning" class="small-warning" hidden></div>
+              </section>
+              <section class="form-section"><div class="section-title"><span class="section-number">03</span><h3>Pozycje i przypisanie</h3><button id="addLine" type="button" class="text-button"><span data-icon="plus"></span> Dodaj</button></div><div id="lines"></div></section>
+              <section class="form-section totals-section"><div class="section-title"><span class="section-number">04</span><h3>Kwoty z faktury</h3></div><div class="fields three"><div class="field"><label for="net_total">Netto</label><input id="net_total" data-key="net_total" inputmode="decimal" required placeholder="0,00"></div><div class="field"><label for="vat_total">VAT</label><input id="vat_total" data-key="vat_total" inputmode="decimal" required placeholder="0,00"></div><div class="field"><label for="gross_total">Brutto</label><input id="gross_total" data-key="gross_total" inputmode="decimal" required placeholder="0,00"></div></div><div class="account-summary" aria-label="Podsumowanie według kont"><h4>Podsumowanie według kont</h4><table><thead><tr><th scope="col">Kategoria / konto</th><th scope="col">Netto</th><th scope="col">VAT</th><th scope="col">Brutto</th></tr></thead><tbody id="accountSummaryBody"></tbody></table><p id="accountSummaryEmpty" class="muted">Dodaj pozycje do podsumowania.</p><p id="bookingWarning" class="booking-warning" hidden>Przypisz kategorię / konto do każdej pozycji przed zatwierdzeniem.</p></div><div id="sumCheck" class="sum-check"></div><div class="total-display"><span>Razem brutto</span><strong id="totalDisplay">—</strong></div></section>
+              <section class="form-section notes-section"><label for="notes">Uwagi <span class="muted">opcjonalnie</span></label><textarea id="notes" data-key="notes" rows="2" maxlength="10000" placeholder="Dodatkowe informacje do dokumentu…"></textarea></section>
+            </fieldset>
+            <section class="form-section" id="postingVat" hidden>
+              <h3>VAT do odliczenia</h3>
+              <p>Wpisz kwotę, którą można odliczyć dla każdej pozycji.</p>
+              <div class="fields two" id="postingVatRows"></div>
+              <div class="posting-actions"><button class="secondary" type="button" id="postingFullVat">Odlicz cały VAT</button><button class="secondary" type="button" id="postingZeroVat">Bez odliczenia</button></div>
+            </section>
+            <div id="correctionFields" class="field form-section" hidden>
+              <label for="correctionReason">Powód poprawki</label>
+              <input id="correctionReason" maxlength="500">
+            </div>
+          </form>
+        </div>
+        <footer id="approvalFooter" class="approval-footer"><label class="review-check"><input id="reviewed" type="checkbox"><span>Sprawdziłem dane, konta i krajowe rozliczenie VAT.</span></label><div class="approval-actions"><div class="save-caption"><span id="saveCaption">Zapis do bazy</span><small id="saveSubcaption">Zapis faktury i księgowanie w jednym kroku</small></div><button id="postingOpenLedger" type="button" class="secondary" hidden>Otwórz księgę</button><button id="postingCorrect" type="button" class="secondary" hidden>Popraw fakturę</button><button id="postingCancel" type="button" class="secondary" hidden>Anuluj poprawkę</button><button id="approveBtn" class="primary" disabled><span data-icon="check"></span><span id="approveText">Zaksięguj fakturę</span></button></div></footer>
+      </section>
+      <section class="preview" aria-label="Podgląd oryginału faktury">
+        <div class="preview-toolbar"><div class="preview-name"><span data-icon="file"></span><div><strong>Dokument źródłowy</strong><span id="filename"></span></div></div><a id="downloadLink" class="icon-button" title="Pobierz oryginał" aria-label="Pobierz oryginał"><span data-icon="download"></span></a></div>
+        <div id="fileChooserWrap" class="file-chooser" hidden><label for="fileChooser">Załącznik</label><select id="fileChooser"></select></div>
+        <div class="preview-controls"><div class="control-group"><button id="prevPage" class="icon-button" aria-label="Poprzednia strona"><span data-icon="left"></span></button><span id="pageIndicator">1 / 1</span><button id="nextPage" class="icon-button" aria-label="Następna strona"><span data-icon="right"></span></button></div><div class="control-group"><button id="zoomOut" class="icon-button" aria-label="Pomniejsz"><span data-icon="minus"></span></button><button id="zoomReset" class="zoom-label" title="Dopasuj do szerokości">100%</button><button id="zoomIn" class="icon-button" aria-label="Powiększ"><span data-icon="plus"></span></button></div></div>
+        <div id="paperArea" class="paper-area"><div id="previewMessage" class="preview-message" role="status"></div><img id="documentImage" class="document-image" alt="Oryginał faktury" hidden></div>
+        <div class="preview-bottom"><span><span data-icon="lock"></span> Oryginał dokumentu</span><span id="previewMeta">PDF</span></div>
+      </section>
+    </div>
+    <section id="ledgerPanel" class="ledger-panel" aria-labelledby="ledgerHeading" hidden>
+      <h2 id="ledgerHeading">Księga klienta</h2>
+      <p id="ledgerClient"></p>
+      <div class="ledger-view-switch" role="tablist" aria-label="Widok księgi">
+        <button id="ledgerViewEntries" type="button" role="tab" aria-selected="true" aria-controls="ledgerResults">Zapisy</button>
+        <button id="ledgerViewAccounts" type="button" role="tab" aria-selected="false" aria-controls="ledgerAccounts">Konta i salda</button>
+      </div>
+
+      <details id="ledgerHelp" class="ledger-help">
+        <summary>Jak czytać debet i kredyt?</summary>
+        <p><strong>Debet (Wn)</strong> to lewa strona zapisu, a <strong>kredyt (Ma)</strong> to prawa. Sumy po obu stronach muszą się zgadzać.</p>
+        <p><strong>Debiteuren</strong> to należności od klientów, a <strong>Crediteuren</strong> to zobowiązania wobec dostawców. Salda uwzględniają zaksięgowane płatności do wybranej daty końcowej.</p>
+        <p>Przykład: faktura zakupowa na 121 € z pełnym odliczeniem VAT. W debecie: 100 € kosztu i 21 € VAT do odliczenia. W kredycie: 121 € do zapłaty dostawcy. Samą zapłatę księguje się osobno.</p>
+      </details>
+      <form id="ledgerFilter" class="ledger-filter">
+        <div class="field"><label for="ledgerFrom">Od daty księgowania</label><input id="ledgerFrom" type="date" required></div>
+        <div class="field"><label for="ledgerTo">Do daty księgowania</label><input id="ledgerTo" type="date" required></div>
+        <button class="primary" type="submit">Pokaż zapisy</button>
+      </form>
+      <div id="ledgerAccountScope" class="ledger-account-scope" hidden>
+        <strong id="ledgerAccountTitle"></strong>
+        <span>Zapisy wybranego konta i jego podkont.</span>
+        <button id="ledgerBackAccounts" type="button" class="secondary">← Konta i salda</button>
+        <button id="ledgerAllEntries" type="button" class="secondary">Wszystkie zapisy</button>
+      </div>
+      <section id="ledgerAccounts" role="tabpanel" aria-labelledby="ledgerViewAccounts" hidden>
+        <div class="ledger-account-tools">
+          <div class="field"><label for="ledgerAccountSearch">Szukaj konta</label><input id="ledgerAccountSearch" type="search" placeholder="Numer lub nazwa, np. 430" autocomplete="off"></div>
+          <details class="ledger-account-options"><summary>Opcje widoku</summary><div>
+            <label class="ledger-empty-toggle"><input id="ledgerHideEmpty" type="checkbox"> Ukryj puste konta</label>
+            <button id="ledgerExpandAccounts" type="button" class="secondary">Rozwiń wszystko</button>
+            <button id="ledgerCollapseAccounts" type="button" class="secondary">Zwiń grupy</button>
+          </div></details>
+        </div>
+        <div id="ledgerAccountSummary" class="ledger-account-summary"></div>
+        <p class="ledger-account-hint">Kliknij konto, aby zobaczyć jego zapisy.</p>
+        <details class="ledger-account-help"><summary>Jak czytać kwoty i podkonta?</summary><p>Kwota w okresie to zmiana salda w podanym zakresie. Saldo na koniec uwzględnia także wcześniejsze zapisy. Dodatnie kwoty oznaczają saldo debetowe dla aktywów i kosztów, a kredytowe dla zobowiązań, kapitału i przychodów. Storna są uwzględnione w saldach. Konto nadrzędne obejmuje wszystkie podkonta, również ukryte filtrem — nie dodawaj ponownie kwoty rodzica i dzieci. Kwoty wynikają wyłącznie z zaksięgowanych operacji w bazie, w EUR.</p></details>
+        <div id="ledgerAccountTableWrap" class="ledger-account-scroll"><table class="ledger-accounts-table" aria-label="Konta i salda klienta">
+          <thead><tr><th scope="col">Konto</th><th scope="col">Kwota w okresie</th><th scope="col" id="ledgerBalanceDate">Saldo na koniec</th><th scope="col">Analiza</th></tr></thead>
+          <tbody id="ledgerAccountRows"></tbody>
+        </table></div>
+        <p id="ledgerAccountEmpty" class="ledger-account-hint" hidden>Brak kont pasujących do filtrów.</p>
+      </section>
+      <p id="ledgerMessage" role="status" aria-live="polite"></p>
+      <div id="ledgerResults" role="tabpanel" aria-labelledby="ledgerViewEntries" hidden>
+        <div id="ledgerTotals" class="ledger-totals"></div>
+        <div class="ledger-scroll">
+          <table class="ledger-table">
+            <thead><tr><th scope="col">Data</th><th scope="col">Dokument / opis</th><th scope="col">Debet (Wn)</th><th scope="col">Kredyt (Ma)</th><th scope="col">Akcje</th></tr></thead>
+            <tbody id="ledgerRows"></tbody>
+          </table>
+        </div>
+        <div class="ledger-pages"><button id="ledgerPrev" class="secondary" type="button">Poprzednia</button><span id="ledgerPage"></span><button id="ledgerNext" class="secondary" type="button">Następna</button></div>
+      </div>
+    </section>
+    <section id="inventarisPanel" class="inventaris-panel" aria-label="Amortyzacja" hidden>
+      <div class="inventaris-intro">
+        <h2>Środki trwałe</h2>
+        <p>Zatwierdzone zakupy na koncie Inventaris. Wybierz pozycję faktury, żeby zapisać plan odpisów.</p>
+      </div>
+      <p id="inventarisMessage" role="status" aria-live="polite"></p>
+      <div class="inventaris-layout">
+        <div>
+          <div id="inventarisList" class="inventaris-list"></div>
+          <div class="inventaris-pages"><button class="secondary" id="inventarisPrev" type="button" hidden>Poprzednia</button><button class="secondary" id="inventarisNext" type="button" hidden>Następna</button></div>
+        </div>
+        <div id="inventarisEditor" class="inventaris-card" hidden>
+          <div class="inventaris-card-heading"><h3 id="inventarisTitle">Plan amortyzacji</h3><button id="inventarisCloseEditor" type="button" class="secondary" aria-label="Zamknij plan">✕</button></div>
+          <p id="inventarisSource"></p>
+          <form id="inventarisForm">
+            <fieldset id="inventarisFields" class="fields two">
+              <div class="field full"><label for="inventarisName">Nazwa środka trwałego</label><input id="inventarisName" maxlength="255" required></div>
+              <div class="field"><label for="inventarisDate">Data przyjęcia do używania</label><input id="inventarisDate" type="date" min="1900-01-01" max="2300-12-31" required></div>
+              <div class="field"><label for="inventarisLife">Okres w miesiącach</label><input id="inventarisLife" type="number" min="1" max="600" required></div>
+              <div class="field"><label for="inventarisCost">Wartość początkowa</label><input id="inventarisCost" inputmode="decimal" maxlength="28" required></div>
+              <div class="field"><label for="inventarisResidual">Wartość końcowa</label><input id="inventarisResidual" inputmode="decimal" maxlength="28" required></div>
+              <div class="field full"><label for="inventarisNotes">Notatka</label><textarea id="inventarisNotes" rows="3" maxlength="1000" placeholder="Np. okoliczności utraty lub numer zgłoszenia"></textarea></div>
+              <div class="field"><label for="inventarisLossType">Utrata środka trwałego</label><select id="inventarisLossType"><option value="">Brak</option><option value="stolen">Skradziony</option><option value="lost">Zgubiony</option></select></div>
+              <div class="field" id="inventarisLossDateField" hidden><label for="inventarisLossDate">Data utraty</label><input id="inventarisLossDate" type="date" min="1900-01-01" max="2300-12-31"></div>
+              <p class="inventaris-hint inventaris-loss-hint full" id="inventarisLossHint" hidden>Plan przestanie naliczać odpisy od dnia utraty. Pozostałą wartość zobaczysz w harmonogramie. Zapis nie tworzy księgowania.</p>
+            </fieldset>
+            <p class="inventaris-hint">Sprawdź wartość początkową, w tym ewentualny nieodliczalny VAT. Kwoty są w walucie faktury.</p>
+            <button id="inventarisSave" class="primary" type="submit">Oblicz i zapisz plan</button>
+          </form>
+          <div id="inventarisSchedule" hidden></div>
+        </div>
+      </div>
+    </section>
+  </main>
+</div>
+<dialog id="splitDialog" class="split-dialog" aria-labelledby="splitTitle">
+  <header class="split-header"><div><span class="eyebrow">JEDNO ZDJĘCIE → OSOBNE DOKUMENTY</span><h2 id="splitTitle">Rozdziel faktury i paragony</h2><p>Przeciągnij po zdjęciu, obejmując cały dokument. Każda ramka to osobny zapis.</p></div><button id="splitClose" type="button" class="icon-button" aria-label="Zamknij podział">✕</button></header>
+  <fieldset id="splitFields" class="split-fields">
+    <div class="split-layout">
+      <div class="split-source">
+        <div class="split-toolbar"><div class="control-group"><button id="splitPrev" type="button" class="secondary" aria-label="Poprzednia strona podziału">←</button><span id="splitPage">1 / 1</span><button id="splitNext" type="button" class="secondary" aria-label="Następna strona podziału">→</button></div><div class="control-group"><button id="splitZoomOut" type="button" class="secondary" aria-label="Pomniejsz zdjęcie">−</button><button id="splitZoomLabel" class="secondary" type="button" title="Dopasuj do szerokości">100%</button><button id="splitFit" type="button" class="secondary">Całe zdjęcie</button><button id="splitZoomIn" type="button" class="secondary" aria-label="Powiększ zdjęcie">+</button></div></div>
+        <p class="split-hint">Przytrzymaj zaznaczenie przy krawędzi, aby przewijać. Możesz też użyć kółka myszy.</p>
+        <div id="splitCanvasWrap" class="split-canvas-wrap"><canvas id="splitCanvas" aria-label="Zaznacz prostokątem każdy dokument" hidden></canvas><p id="splitLoadMessage" role="status">Wczytywanie zdjęcia…</p></div>
+        <div class="split-quick"><button id="splitHorizontal" type="button" class="text-button">Dwa obok siebie</button><button id="splitVertical" type="button" class="text-button">Dwa jeden pod drugim</button><button id="splitWholePage" type="button" class="text-button">Cała strona jako dokument</button></div>
+      </div>
+      <aside class="split-parts"><h3>Dokumenty <span id="splitCount" class="count">0</span></h3><p class="muted">Minimum 2. Sprawdź, czy ramki obejmują całe paragony — razem z kwotami.</p><div id="splitRegions"></div><p id="splitEmpty" class="list-empty">Zaznacz pierwszy dokument na zdjęciu.</p></aside>
+    </div>
+    <footer class="split-footer"><div><label class="review-check"><input id="splitReviewed" type="checkbox"><span>Zaznaczyłem wszystkie dokumenty w całości; każdy znajduje się w osobnej ramce.</span></label><p id="splitError" class="error-text" role="alert"></p><small>Oryginał zostaje zachowany. Podział można cofnąć, dopóki żaden wycinek nie ma zapisanej faktury.</small></div><button id="splitSave" type="button" class="primary" disabled>Utwórz osobne dokumenty</button></footer>
+  </fieldset>
+  <div id="splitBusy" class="split-busy" hidden><span class="spinner"></span><strong>Tworzę osobne dokumenty…</strong><p>Poczekaj na zakończenie podziału.</p></div>
+</dialog>
+<div id="busyOverlay" class="busy-overlay" hidden><div><span class="spinner"></span><strong id="busyText">Odczytywanie dokumentu…</strong><p>Przetwarzanie skanów może potrwać dłużej.</p></div></div>
+<div id="toast" class="toast" role="status" hidden></div>
+</body></html>

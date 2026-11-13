@@ -1,0 +1,30 @@
+.ledger-open #workspace,.ledger-open #emptyState,.ledger-open .view-tabs,
+.ledger-open .sidebar>:is(.queue-heading,.upload,.search-wrap,.queue-tabs,.ai-summary,.document-list,#loadMore){display:none}
+.ledger-open .sidebar-footer{margin-top:auto}
+.ledger-panel{flex:1;min-width:0;min-height:0;overflow:auto;padding:clamp(14px,3vw,32px);color:#173b34}
+.ledger-panel h2{margin:0 0 6px}
+#ledgerClient,#ledgerMessage{color:#516c63;margin:8px 0}
+.ledger-filter{display:flex;flex-wrap:wrap;align-items:end;gap:10px;margin:18px 0}
+.ledger-totals,.ledger-actions,.ledger-pages{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.ledger-totals{gap:12px;margin:12px 0}
+.ledger-totals span{padding:8px 12px;background:#f0f7f3;border-radius:8px}
+.ledger-scroll{max-width:100%;overflow:auto}
+.ledger-table{width:100%;border-collapse:collapse;font-size:.86rem;min-width:560px}
+.ledger-table th,.ledger-table td{text-align:left;padding:9px;border-bottom:1px solid #e2ebe6}
+.ledger-table th{background:#f2f7f4}
+.ledger-table small{display:block;color:#516c63;margin-top:4px}
+.ledger-table td:nth-child(2){overflow-wrap:anywhere}
+.ledger-table .ledger-number{text-align:right;white-space:nowrap;font-variant-numeric:tabular-nums}
+.ledger-table:not(.ledger-detail) th:nth-child(3),.ledger-table:not(.ledger-detail) th:nth-child(4),.ledger-detail th:nth-child(n+3){text-align:right}
+#ledgerDetails>td{background:#f7faf8;padding-left:16px}
+.ledger-pages{margin-top:12px}
+.ledger-actions button{font-size:.8rem;padding:6px 8px}
+.split-child-status{display:block;font-size:.72rem;font-weight:400}
+.ledger-help{max-width:680px;margin:12px 0;padding:10px 12px;background:#f0f7f3;border-radius:8px;font-size:.86rem;line-height:1.5}
+.ledger-help summary{cursor:pointer;font-weight:600}
+.ledger-help p{margin:8px 0 0}
+.ledger-history article{padding:10px 0;max-width:100%}
+.ledger-history article+article{border-top:1px solid #e2ebe6}
+.ledger-history p{margin:6px 0;white-space:pre-wrap;overflow-wrap:anywhere}
+.ledger-history summary{cursor:pointer;padding:5px 0;color:#225245}
+.ledger-totals small{color:#516c63}

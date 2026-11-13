@@ -1,0 +1,4 @@
+.split-action .auto-split-buttons{display:flex;gap:8px;flex-wrap:wrap;flex:0 1 auto;min-width:0}
+.auto-split-buttons button{min-height:40px;white-space:normal!important}
+#splitAuto{border-color:#245b4b;background:#245b4b;color:white}
+@media(max-width:650px){.split-action .auto-split-buttons{flex:1 1 100%}.auto-split-buttons button{flex:1 1 140px}}

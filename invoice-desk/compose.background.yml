@@ -1,0 +1,18 @@
+# Use together with compose.yml after the additive migration and .env configuration.
+services:
+  app:
+    environment:
+      BACKGROUND_PROCESSING: "1"
+  worker:
+    build: .
+    command: ["python", "-m", "app.worker"]
+    env_file: .env
+    environment:
+      DOCUMENT_STORAGE: /data/files
+      BACKGROUND_PROCESSING: "1"
+      APP_DEMO: "0"
+      DEMO_SEED: "0"
+    extra_hosts: ["host.docker.internal:host-gateway"]
+    volumes: ["invoice_files:/data/files"]
+    restart: unless-stopped
+    stop_grace_period: 150s

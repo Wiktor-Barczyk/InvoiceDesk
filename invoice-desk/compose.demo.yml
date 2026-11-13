@@ -1,0 +1,36 @@
+name: invoice-desk-demo
+services:
+  db:
+    image: postgres:16
+    environment:
+      POSTGRES_DB: invoice_desk_demo
+      POSTGRES_USER: invoice_demo
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:?Run python3 prepare.py demo}
+    volumes:
+      - demo_db:/var/lib/postgresql/data
+      - ./database:/invoice-desk/database:ro
+      - ./app/migrations:/invoice-desk/migrations:ro
+      - ./docker/demo-init.sh:/docker-entrypoint-initdb.d/01-invoice-desk.sh:ro
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U invoice_demo -d invoice_desk_demo"]
+      interval: 3s
+      timeout: 3s
+      retries: 30
+  app:
+    build: .
+    ports: ["127.0.0.1:8000:8000"]
+    environment:
+      DATABASE_URL: postgresql://invoice_demo:${POSTGRES_PASSWORD}@db:5432/invoice_desk_demo
+      APP_SESSION_SECRET: ${APP_SESSION_SECRET:?Run python3 prepare.py demo}
+      APP_DEMO: "1"
+      DEMO_SEED: "1"
+      DEMO_PASSWORD: ${DEMO_PASSWORD:?Run python3 prepare.py demo}
+      COOKIE_SECURE: "0"
+      OCR_LANGUAGES: pol+nld+eng
+    volumes: ["demo_files:/data/files"]
+    depends_on:
+      db: {condition: service_healthy}
+    restart: unless-stopped
+volumes:
+  demo_db:
+  demo_files:
