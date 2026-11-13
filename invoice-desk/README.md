@@ -67,7 +67,7 @@ The project does not include a complete banking module, tax return submission, p
 ## Workflow
 
 1. A staff member signs in and selects a client.
-2. They upload documents. The application stores the originals and checks whether a scan can be split into separate documents.
+2. They upload documents (optional). The application stores the originals and checks whether a scan can be split into separate documents.
 3. AI prepares proposed invoice data, including ledger accounts and VAT codes. The document waits in the queue; the staff member can work on another document.
 4. The staff member compares the form with the original, corrects the fields and confirms the review.
 5. Clicking **Post invoice** creates the invoice, invoice lines, balanced journal entry and VAT register records in one transaction. The current interface labels this button **Zaksięguj fakturę**.
